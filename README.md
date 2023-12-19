@@ -88,3 +88,16 @@ If you find this code useful, please consider citing our paper:
   year      = {2023},
 }
 ```
+
+## Acknowledgements
+
+We thank the authors of [ALFWORLD](https://github.com/alfworld/alfworld/tree/master) for releasing their code.
+
+## License
+
+- LLM-Planner - MIT License
+- ALFWorld - MIT License
+
+## Contact
+
+Questions or issues? File an issue or contact [Luke Song](https://chanh.ee)

@@ -2,7 +2,7 @@
 
 import pickle
 import pandas as pd
-import openai
+from openai import OpenAI
 import random
 from ast import literal_eval
 from sentence_transformers import SentenceTransformer
@@ -10,7 +10,11 @@ from sentence_transformers.util import cos_sim
 
 
 #NOTE Add your openai API key here
-openai.api_key= ""
+# openai.api_key= ""
+
+client = OpenAI(
+    api_key="",
+)
 
 
 ACT_TO_STR = {
@@ -153,7 +157,7 @@ class LLM_HLP_Generator():
 
 
     #run GPT-3 on specified test set using the KNN prompts
-    def run_gpt3(self, prompt, logit_bias_text, engine='text-davinci-002', max_tokens=200):
+    def run_gpt3(self, prompt, logit_bias_text, engine='gpt-3.5-turbo-instruct', max_tokens=200):
         
         #GENERATE Relation Extraction PREDICTIONS
         gpt3_output = []
@@ -171,15 +175,27 @@ class LLM_HLP_Generator():
             print("\n---------------Logit Bias Objects----------------")
             print(logit_bias_text)
 
-        sample = openai.Completion.create(engine=engine,
-                                        prompt=prompt,
-                                        max_tokens=max_tokens,
-                                        temperature=0,
-                                        logit_bias = logit_biases)
+        # sample = openai.Completion.create(engine=engine,
+        #                                 prompt=prompt,
+        #                                 max_tokens=max_tokens,
+        #                                 temperature=0,
+        #                                 logit_bias = logit_biases)
+        
+        
+        sample = client.chat.completions.create(
+                                            model=engine,  # Use "model" instead of "engine"
+                                            messages=[
+                                                {"role": "user", "content": prompt}
+                                            ],
+                                            max_tokens=max_tokens,
+                                            temperature=0,
+                                            logit_bias=logit_biases
+                                        )
+
 
         gpt3_output.append(sample)
-        prediction = sample['choices'][0]['text']
-
+        # prediction = sample['choices'][0]['text']
+        prediction = sample['choices'][0].message.content
         return prediction, gpt3_output   
 
     # Main point of entry for LLM HLP generator

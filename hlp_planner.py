@@ -7,13 +7,14 @@ import random
 from ast import literal_eval
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
+import os
 
 
 #NOTE Add your openai API key here
 # openai.api_key= ""
 
 client = OpenAI(
-    api_key="",
+    api_key=os.getenv('OPENAI_API_KEY'),
 )
 
 
@@ -157,7 +158,7 @@ class LLM_HLP_Generator():
 
 
     #run GPT-3 on specified test set using the KNN prompts
-    def run_gpt3(self, prompt, logit_bias_text, engine='gpt-3.5-turbo-instruct', max_tokens=200):
+    def run_gpt3(self, prompt, logit_bias_text, engine='gpt-3.5-turbo', max_tokens=200):
         
         #GENERATE Relation Extraction PREDICTIONS
         gpt3_output = []
@@ -193,17 +194,15 @@ class LLM_HLP_Generator():
                                         )
 
 
-        gpt3_output.append(sample)
-        # prediction = sample['choices'][0]['text']
-        prediction = sample['choices'][0].message.content
-        return prediction, gpt3_output   
+        prediction = sample.choices[0].message.content
+        return prediction   
 
     # Main point of entry for LLM HLP generator
     def generate_hlp(self, curr_task, k):
 
         prompt = self.generate_prompt(curr_task, k, removeNav=False, naturalFormat=False, includeLow=False)
 
-        generated_hlp, gpt3_output = self.run_gpt3(prompt, curr_task["vis_objs"])
+        generated_hlp = self.run_gpt3(prompt, curr_task["vis_objs"])
 
         return generated_hlp 
 
